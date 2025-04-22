@@ -1,0 +1,42 @@
+﻿# Rider
+.idea/
+*.sln.iml
+
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.sln.docstates
+*.vs/
+
+# Logs
+*.log
+logs/
+
+# dotenv / secrets
+.env
+*.env
+appsettings.json
+appsettings.Development.json
+secrets.json
+
+# Publish
+publish/
+wwwroot/
+
+# Packages
+*.nupkg
+packages/
+artifacts/
+
+# Coverage / test results
+coverage*/
+*.coverage
+TestResult.xml
+
+# macOS / Windows system files
+.DS_Store
+Thumbs.db
