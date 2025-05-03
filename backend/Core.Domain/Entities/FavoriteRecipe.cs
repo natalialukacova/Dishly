@@ -1,4 +1,6 @@
-﻿namespace Core.Domain.Entities
+﻿using System;
+
+namespace Core.Domain.Entities
 {
     public class FavoriteRecipe
     {
