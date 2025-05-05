@@ -4,12 +4,16 @@ using Core.Domain.Interfaces;
 using Infrastructure.Repositories;
 using Application.Interfaces;
 using Application.Services;
+using Infrastructure.WebSocket; 
+using Startup.Extensions;
+using Application.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
+builder.Services.AddAppOptions(builder.Configuration);
+builder.Services.ConfigureAppServices(builder.Configuration);
 
-// Database
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
@@ -17,20 +21,18 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IFavoriteRecipeRepository, FavoriteRecipeRepository>();
 builder.Services.AddScoped<IFavoriteRecipeService, FavoriteRecipeService>();
 
-// Add Controllers
-builder.Services.AddControllers();
+builder.Services.AddHostedService<WebSocketServerService>();
+
+builder.Services.AddRestApi(); 
+builder.Services.AddWebsocketInfrastructure(); 
 
 var app = builder.Build();
 
-// Run migrations
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
-}
 
-
+app.MigrateDatabase(); 
 app.UseRouting();
-app.MapControllers();            
+app.ConfigureRestApi();        
+app.ConfigureWebsocketApi();    
+app.StartProxyServer();         
 
 app.Run();
