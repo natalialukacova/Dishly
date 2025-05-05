@@ -1,19 +1,38 @@
 ﻿using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
+using Core.Domain.Interfaces;
+using Infrastructure.Repositories;
+using Application.Interfaces;
+using Application.Services;
+using Infrastructure.WebSocket; 
+using Startup.Extensions;
+using Application.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-
 var configuration = builder.Configuration;
 
+builder.Services.AddAppOptions(builder.Configuration);
+builder.Services.ConfigureAppServices(builder.Configuration);
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+
+// Dependency Injection
+builder.Services.AddScoped<IFavoriteRecipeRepository, FavoriteRecipeRepository>();
+builder.Services.AddScoped<IFavoriteRecipeService, FavoriteRecipeService>();
+
+builder.Services.AddHostedService<WebSocketServerService>();
+
+builder.Services.AddRestApi(); 
+builder.Services.AddWebsocketInfrastructure(); 
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
-}
+
+app.MigrateDatabase(); 
+app.UseRouting();
+app.ConfigureRestApi();        
+app.ConfigureWebsocketApi();    
+app.StartProxyServer();         
 
 app.Run();
