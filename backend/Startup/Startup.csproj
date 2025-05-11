@@ -4,6 +4,7 @@
     <ProjectReference Include="..\Core.Domain\Core.Domain.csproj" />
     <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+    <ProjectReference Include="..\Infrastructure.AI\Infrastructure.AI.csproj" />
     <ProjectReference Include="..\Infrastructure.WebSocket\Infrastructure.WebSocket.csproj" />
     <ProjectReference Include="..\API.REST\API.REST.csproj" />
   </ItemGroup>
