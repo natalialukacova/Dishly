@@ -5,6 +5,7 @@ using Infrastructure.Repositories;
 using Application.Interfaces;
 using Application.Services;
 using Infrastructure.WebSocket; 
+using Infrastructure.AI;
 using Startup.Extensions;
 using Application.Models;
 
@@ -22,6 +23,7 @@ builder.Services.AddScoped<IFavoriteRecipeRepository, FavoriteRecipeRepository>(
 builder.Services.AddScoped<IFavoriteRecipeService, FavoriteRecipeService>();
 
 builder.Services.AddHostedService<WebSocketServerService>();
+builder.Services.AddHttpClient<IAIChatProxy, AIChatProxy>();
 
 builder.Services.AddRestApi(); 
 builder.Services.AddWebsocketInfrastructure(); 
@@ -30,6 +32,12 @@ var app = builder.Build();
 
 
 app.MigrateDatabase(); 
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage(); 
+}
+
 app.UseRouting();
 app.ConfigureRestApi();        
 app.ConfigureWebsocketApi();    
