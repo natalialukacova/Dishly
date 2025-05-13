@@ -2,7 +2,7 @@
 {
     public class ChatWebSocketMessage
     {
-        public string RecipeId { get; set; }
-        public string Message { get; set; }
+        public required string RecipeId { get; set; }
+        public required string Message { get; set; }
     }
 }
