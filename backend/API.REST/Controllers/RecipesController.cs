@@ -15,9 +15,9 @@ public class RecipesController : ControllerBase
     }
 
     [HttpGet("search")]
-public async Task<IActionResult> Search([FromQuery] string ingredients)
-{
-    var result = await _recipeService.SearchRecipesByIngredientsAsync(ingredients);
-    return Ok(result);
-}
+    public async Task<IActionResult> Search([FromQuery] string ingredients)
+    {
+        var result = await _recipeService.SearchRecipesByIngredientsAsync(ingredients);
+        return Ok(result);
+    }
 }
