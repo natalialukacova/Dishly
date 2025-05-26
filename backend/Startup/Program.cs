@@ -6,10 +6,12 @@ using Application.Interfaces;
 using Application.Services;
 using Infrastructure.WebSocket; 
 using Infrastructure.AI;
+using Infrastructure.ExternalApi;
 using Startup.Extensions;
 using Application.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseUrls("http://0.0.0.0:5000");
 var configuration = builder.Configuration;
 
 builder.Services.AddAppOptions(builder.Configuration);
@@ -21,10 +23,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Dependency Injection
 builder.Services.AddScoped<IFavoriteRecipeRepository, FavoriteRecipeRepository>();
 builder.Services.AddScoped<IFavoriteRecipeService, FavoriteRecipeService>();
+builder.Services.AddScoped<IRecipeApiService, RecipeApiService>();
 
 builder.Services.AddHostedService<WebSocketServerService>();
 builder.Services.AddHttpClient<IAIChatProxy, AIChatProxy>();
 
+builder.Services.AddHttpClient();
 builder.Services.AddRestApi(); 
 builder.Services.AddWebsocketInfrastructure(); 
 
