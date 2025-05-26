@@ -1,11 +1,8 @@
 ﻿from typing import List, Dict
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
-from langchain_ollama import ChatOllama
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 import asyncio
 from starlette.concurrency import run_in_threadpool
-
-llm = ChatOllama(model="llama3", streaming=True, callbacks=[StreamingStdOutCallbackHandler()])
+from llm import llm
 
 def build_chat_history(system_prompt: str, recipe_text: str, memory: List[Dict], user_message: str):
     history = [

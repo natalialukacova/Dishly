@@ -1,12 +1,12 @@
 ﻿import time
-
+import os
 from pymongo import MongoClient
 from typing import List, Dict
-import os
+from config import MONGO_URI, MONGO_DB_NAME, MONGO_COLLECTION
 
-client = MongoClient("mongodb://localhost:27017")
-db = client["dishly"]
-collection = db["chat_memory"]
+client = MongoClient(MONGO_URI)
+db = client[MONGO_DB_NAME]
+collection = db[MONGO_COLLECTION]
 
 def get_memory(recipe_id: int) -> List[Dict]:
     doc = collection.find_one({"recipe_id": recipe_id})

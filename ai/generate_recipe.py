@@ -1,15 +1,12 @@
-﻿# generate_recipe.py
-
-from fastapi import APIRouter
-from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import OllamaEmbeddings
+﻿from langchain_community.vectorstores import FAISS
+from langchain_ollama import OllamaEmbeddings
 from langchain.schema import Document
 import os
 from memory import get_recipe_text
+from config import OLLAMA_MODEL_NAME
 
-router = APIRouter()
-embedding_model = OllamaEmbeddings(model="llama3")
 
+embedding_model = OllamaEmbeddings(model=OLLAMA_MODEL_NAME)
 
 def index_recipe_text(recipe_id: int, recipe_text: str):
     os.makedirs("vectorstore", exist_ok=True)
@@ -29,9 +26,3 @@ def get_recipe_context(recipe_id: int, query: str) -> str:
         except Exception as e:
             print(f"[RAG] FAISS error: {e}")
     return get_recipe_text(recipe_id)
-
-
-@router.post("/index_recipe/{recipe_id}")
-def api_index_recipe(recipe_id: int, text: str):
-    index_recipe_text(recipe_id, text)
-    return {"status": "indexed"}

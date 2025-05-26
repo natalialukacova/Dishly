@@ -1,9 +1,10 @@
 ﻿from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import OllamaEmbeddings
+from langchain_ollama import OllamaEmbeddings
 from langchain.schema import Document
+from config import OLLAMA_MODEL_NAME
 import os
 
-embedding_model = OllamaEmbeddings(model="llama3")
+embedding_model = OllamaEmbeddings(model=OLLAMA_MODEL_NAME)
 
 def index_recipe_text(recipe_id: int, recipe_text: str):
     os.makedirs("vectorstore", exist_ok=True)
