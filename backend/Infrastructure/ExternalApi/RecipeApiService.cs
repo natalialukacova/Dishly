@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Core.Domain.Interfaces;
@@ -22,6 +23,7 @@ public class RecipeApiService : IRecipeApiService
 
     public async Task<List<Recipe>> SearchRecipesByIngredientsAsync(string ingredients)
     {
+        var encodedIngredients = Uri.EscapeDataString(ingredients);
         var url = $"https://api.spoonacular.com/recipes/findByIngredients?ingredients={ingredients}&number=5&apiKey={_options.ApiKey}";
         var response = await _httpClient.GetAsync(url);
 
@@ -69,6 +71,36 @@ public class RecipeApiService : IRecipeApiService
             };
 
             detailedRecipes.Add(recipe);
+            
+            // Build readable recipe text
+            var ingredientsText = string.Join(", ", recipe.Ingredients);
+            var instructionsText = recipe.Instructions;
+            var recipeText = $"Ingredients: {ingredientsText}\nInstructions: {instructionsText}";
+
+            // Send to Python backend
+            var storePayload = new
+            {
+                recipe_id = recipe.Id,
+                recipe_text = recipeText
+            };
+
+            try
+            {
+                var storeResponse = await _httpClient.PostAsJsonAsync("http://localhost:8000/store_recipe", storePayload);
+                if (storeResponse.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"[C#] Stored recipe {recipe.Id} in Python backend.");
+                }
+                else
+                {
+                    Console.WriteLine($"[C#] Failed to store recipe {recipe.Id}. Status: {storeResponse.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[C#] Exception while storing recipe: {ex.Message}");
+            }
+
         }
 
         return detailedRecipes;

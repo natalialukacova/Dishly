@@ -1,30 +1,38 @@
-﻿from langchain_ollama import ChatOllama
-from langchain.prompts import ChatPromptTemplate
-from langchain.chains import LLMChain
-from typing import List, Dict
+﻿from typing import List, Dict
+from langchain.schema import AIMessage, HumanMessage, SystemMessage
+from langchain_ollama import ChatOllama
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+import asyncio
+from starlette.concurrency import run_in_threadpool
 
-system_prompt = """
-You are Dishly, an expert cooking assistant. Speak in a friendly and concise tone.
-Always:
-- Ask clarifying questions if needed.
-- Use metric units.
-- Avoid giving unsafe advice.
-- Reference memory if past interactions are available.
-"""
+llm = ChatOllama(model="llama3", streaming=True, callbacks=[StreamingStdOutCallbackHandler()])
 
-
-llm = ChatOllama(model="llama3")
-
-def get_ai_response(user_message: str, memory: List[Dict]) -> str:
-    # Convert memory to LangChain message format
-    messages = [("system", system_prompt)]
+def build_chat_history(system_prompt: str, recipe_text: str, memory: List[Dict], user_message: str):
+    history = [
+        SystemMessage(content=system_prompt),
+        HumanMessage(content=f"Here is the recipe context:\n{recipe_text}")
+    ]
     for m in memory:
-        role = "human" if m["role"] == "user" else "ai"
-        messages.append((role, m["content"]))
-    messages.append(("human", user_message))
+        if m["role"] == "user":
+            history.append(HumanMessage(content=m["content"]))
+        elif m["role"] == "assistant":
+            history.append(AIMessage(content=m["content"]))
+    history.append(HumanMessage(content=user_message))
+    return history
 
-    # Compose prompt and run
-    prompt = ChatPromptTemplate.from_messages(messages)
-    chain = LLMChain(llm=llm, prompt=prompt)
+async def get_ai_response(system_prompt: str, user_message: str, memory: List[Dict], recipe_text: str) -> str:
+    chat_history = build_chat_history(system_prompt, recipe_text, memory, user_message)
+    try:
+        result = await asyncio.wait_for(
+            run_in_threadpool(lambda: llm.invoke(chat_history)),
+            timeout=30
+        )
+        return result.content if hasattr(result, "content") else str(result)
+    except asyncio.TimeoutError:
+        return "Sorry, I took too long to think. Could you try again?"
 
-    return chain.run(input=user_message)
+async def llm_stream(chat_history):
+    for chunk in llm.stream(chat_history):  
+        if hasattr(chunk, "content"):
+            yield chunk.content
+        await asyncio.sleep(0.01)
