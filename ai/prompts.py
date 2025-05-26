@@ -16,12 +16,14 @@ You are Dishly, a creative AI chef.
 
 def generate_recipe_prompt(idea: str) -> str:
     return (
-        f"Create a complete recipe based on this idea:\n'{idea}'.\n\n"
-        f"Respond in this format:\n\n"
-        f"### Title\n"
-        f"Recipe Title\n\n"
+        f"Create a complete and realistic recipe based on this idea: '{idea}'.\n\n"
+        f"Respond using **exactly this format**:\n\n"
+        f"### Title\n\n"
         f"### Ingredients\n"
-        f"- List all ingredients with metric units\n\n"
+        f"- Ingredient 1\n"
+        f"- Ingredient 2\n\n"
         f"### Instructions\n"
-        f"1. Step-by-step instructions"
+        f"1. Step one\n"
+        f"2. Step two\n\n"
+        f"Use metric units and do not skip any sections."
     )
