@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/widgets/recipe_detail/ingredients_card.dart';
 import 'package:mobile/widgets/recipe_detail/instructions_card.dart';
+import '../core/theme.dart';
 import '../models/recipe.dart';
-import '../widgets/recipe_detail/info_icon.dart';
 import '../widgets/recipe_detail/nutrition_summary.dart';
+import '../widgets/recipe_detail/recipe_info.dart';
+import 'chat_screen.dart';
+import '../utils/recipe_utils.dart';
+
 
 class RecipeDetailScreen extends StatelessWidget {
   final Recipe recipe;
 
   const RecipeDetailScreen({super.key, required this.recipe});
 
-  List<String> _splitInstructions(String raw) {
-    return raw
-        .split(RegExp(r'(?<=\.)\s+'))
-        .map((s) => s.trim())
-        .where((s) => s.isNotEmpty)
-        .toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(recipe.title)),
+      appBar: AppBar(
+        title: Text(recipe.title),
+        backgroundColor: primaryColor,
+        foregroundColor: Colors.white,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -35,27 +35,36 @@ class RecipeDetailScreen extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            Wrap(
-              spacing: 12,
-              runSpacing: 8,
-              alignment: WrapAlignment.center,
-              children: [
-                InfoIcon(icon: Icons.schedule, label: "${recipe.readyInMinutes} min"),
-                InfoIcon(icon: Icons.people, label: "${recipe.servings}"),
-                if (recipe.vegan) InfoIcon(icon: Icons.eco, label: "Vegan"),
-                if (recipe.vegetarian && !recipe.vegan)
-                  InfoIcon(icon: Icons.local_florist, label: "Vegetarian"),
-                if (recipe.glutenFree) InfoIcon(icon: Icons.no_food, label: "Gluten-Free"),
-              ],
-            ),
+            RecipeInfo(recipe: recipe),
             const SizedBox(height: 24),
             if (recipe.nutrients.isNotEmpty)
               NutritionSummary(nutrients: recipe.nutrients),
             const SizedBox(height: 8),
             IngredientsCard(ingredients: recipe.ingredients),
             const SizedBox(height: 16),
-            InstructionsCard(steps: _splitInstructions(recipe.instructions)),
+            InstructionsCard(steps: splitInstructions(recipe.instructions)),
           ],
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: ElevatedButton.icon(
+          icon: const Icon(Icons.chat, color: Colors.white),
+          label: const Text("Ask AI about this recipe"),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF2E5C9A),
+            foregroundColor: Colors.white,
+            minimumSize: const Size.fromHeight(50),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ChatScreen(recipe: recipe),
+              ),
+            );
+          },
         ),
       ),
     );
