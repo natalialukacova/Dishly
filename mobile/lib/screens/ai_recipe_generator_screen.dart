@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../core/theme.dart';
+import '../widgets/ingredient_input.dart';
 
 class AIRecipeGeneratorScreen extends StatefulWidget {
   const AIRecipeGeneratorScreen({super.key});
@@ -12,8 +13,6 @@ class AIRecipeGeneratorScreen extends StatefulWidget {
 
 class _AIRecipeGeneratorScreenState extends State<AIRecipeGeneratorScreen> {
   final TextEditingController _ideaController = TextEditingController();
-  final List<String> _dietaryOptions = ["Vegan", "Vegetarian", "Gluten-Free"];
-  final Set<String> _selectedFilters = {};
   String? _generatedRecipe;
   bool _isLoading = false;
 
@@ -29,10 +28,7 @@ class _AIRecipeGeneratorScreenState extends State<AIRecipeGeneratorScreen> {
     final response = await http.post(
       Uri.parse('http://192.168.0.145:8000/generate_recipe'),
       headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        "idea": idea,
-        "dietary": _selectedFilters.toList()
-      }),
+      body: json.encode({"idea": idea}),
     );
 
     if (response.statusCode == 200) {
@@ -43,6 +39,67 @@ class _AIRecipeGeneratorScreenState extends State<AIRecipeGeneratorScreen> {
     }
 
     setState(() => _isLoading = false);
+  }
+
+  Widget _buildRecipeView(String raw) {
+    final lines = raw.split('\n');
+    String title = "";
+    List<String> ingredients = [];
+    List<String> instructions = [];
+
+    String currentSection = "";
+
+    for (int i = 0; i < lines.length; i++) {
+      final line = lines[i].trim();
+
+      if (line.startsWith("### ")) {
+        final section = line.substring(4).toLowerCase();
+        if (section.contains("ingredients")) {
+          currentSection = "ingredients";
+        } else if (section.contains("instructions")) {
+          currentSection = "instructions";
+        } else {
+          // If not "ingredients" or "instructions", assume this is the title
+          currentSection = "";
+          if (title.isEmpty) title = line.substring(4).trim();
+        }
+        continue;
+      }
+
+      if (currentSection == "ingredients" && line.startsWith("- ")) {
+        ingredients.add(line.substring(2));
+      } else if (currentSection == "instructions" && RegExp(r'^\d+\.\s').hasMatch(line)) {
+        instructions.add(line);
+      }
+
+      // Catch description right after title
+      if (title.isNotEmpty && currentSection == "" && line.isNotEmpty && !line.startsWith("- ") && !RegExp(r'^\d+\.\s').hasMatch(line)) {
+        title += "\n" + line;
+      }
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (title.isNotEmpty)
+          Text(
+            title,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+        const SizedBox(height: 16),
+        if (ingredients.isNotEmpty) ...[
+          const Text("🧂 Ingredients", style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 6),
+          ...ingredients.map((i) => Text("• $i")).toList(),
+          const SizedBox(height: 16),
+        ],
+        if (instructions.isNotEmpty) ...[
+          const Text("🔪 Instructions", style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 6),
+          ...instructions.map((step) => Text(step)).toList(),
+        ],
+      ],
+    );
   }
 
   @override
@@ -58,90 +115,38 @@ class _AIRecipeGeneratorScreenState extends State<AIRecipeGeneratorScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            TextField(
-              controller: _ideaController,
-              decoration: const InputDecoration(
-                labelText: "🧺 Enter ingredients or idea",
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Wrap(
-                spacing: 8,
-                children: _dietaryOptions.map((diet) {
-                  final selected = _selectedFilters.contains(diet);
-                  return FilterChip(
-                    label: Text(diet),
-                    selected: selected,
-                    selectedColor: primaryColor.withOpacity(0.2),
-                    onSelected: (bool value) {
-                      setState(() {
-                        value ? _selectedFilters.add(diet) : _selectedFilters.remove(diet);
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
-            ),
+            IngredientInput(controller: _ideaController),
             const SizedBox(height: 20),
             ElevatedButton.icon(
-              icon: const Icon(Icons.auto_awesome),
-              label: const Text("Generate"),
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 foregroundColor: Colors.white,
-                minimumSize: const Size.fromHeight(50),
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
               onPressed: _generateRecipe,
+              icon: const Icon(Icons.auto_awesome, color: Colors.white),
+              label: const Text("Generate"),
             ),
             const SizedBox(height: 20),
             if (_isLoading) const CircularProgressIndicator(),
-            if (_generatedRecipe != null) Expanded(
-              child: Card(
-                color: Colors.white,
-                elevation: 2,
-                margin: const EdgeInsets.only(top: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _generatedRecipe!,
-                          style: const TextStyle(fontSize: 16, height: 1.5),
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            ElevatedButton.icon(
-                              icon: const Icon(Icons.save),
-                              label: const Text("Save"),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: primaryColor,
-                                foregroundColor: Colors.white,
-                              ),
-                              onPressed: () {
-                                // TODO: Save logic
-                              },
-                            ),
-                            const SizedBox(width: 12),
-                            OutlinedButton.icon(
-                              icon: const Icon(Icons.refresh),
-                              label: const Text("Regenerate"),
-                              onPressed: _generateRecipe,
-                            ),
-                          ],
-                        )
-                      ],
+            if (_generatedRecipe != null)
+              Expanded(
+                child: Card(
+                  color: Colors.white,
+                  elevation: 2,
+                  margin: const EdgeInsets.only(top: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: SingleChildScrollView(
+                      child: _buildRecipeView(_generatedRecipe!),
                     ),
                   ),
                 ),
-              ),
-            )
+              )
           ],
         ),
       ),
