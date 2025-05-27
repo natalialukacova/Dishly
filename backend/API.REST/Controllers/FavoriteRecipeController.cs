@@ -49,4 +49,11 @@ public class FavoriteRecipeController : ControllerBase
         await _service.DeleteAsync(id);
         return NoContent();
     }
+
+	[HttpGet("recipes")]
+	public async Task<IActionResult> GetDetailedFavorites()
+	{
+    	var recipes = await _service.GetDetailedFavoritesAsync();
+    	return Ok(recipes);
+	}
 }
