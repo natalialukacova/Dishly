@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:mobile/screens/ai_recipe_generator_screen.dart';
+import 'package:mobile/screens/favorites_screen.dart';
 import '../../../widgets/home_button.dart';
 import '../../../core/theme.dart';
 import './recipe_search_screen.dart';
@@ -39,7 +40,10 @@ class HomeScreen extends StatelessWidget {
       {
         'icon': Icons.favorite,
         'label': 'Favorite Recipes',
-        'onTap': () {}, // TODO
+        'onTap': () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => FavoriteRecipesScreen()),
+        ),
       },
       {
         'icon': Icons.chat,

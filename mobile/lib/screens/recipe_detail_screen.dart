@@ -1,26 +1,84 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/widgets/recipe_detail/ingredients_card.dart';
-import 'package:mobile/widgets/recipe_detail/instructions_card.dart';
 import '../core/theme.dart';
 import '../models/recipe.dart';
+import '../services/favorites_service.dart';
+import '../utils/recipe_utils.dart';
+import '../widgets/recipe_detail/ingredients_card.dart';
+import '../widgets/recipe_detail/instructions_card.dart';
 import '../widgets/recipe_detail/nutrition_summary.dart';
 import '../widgets/recipe_detail/recipe_info.dart';
 import 'chat_screen.dart';
-import '../utils/recipe_utils.dart';
 
-
-class RecipeDetailScreen extends StatelessWidget {
+class RecipeDetailScreen extends StatefulWidget {
   final Recipe recipe;
 
   const RecipeDetailScreen({super.key, required this.recipe});
 
   @override
+  State<RecipeDetailScreen> createState() => _RecipeDetailScreenState();
+}
+
+class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
+  bool isFavorite = false;
+  String? favoriteId;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfFavorite();
+  }
+
+  Future<void> _checkIfFavorite() async {
+    try {
+      final id = await FavoriteRecipeService.getFavoriteIdForRecipe(widget.recipe);
+      setState(() {
+        isFavorite = id != null;
+        favoriteId = id;
+      });
+    } catch (e) {
+      debugPrint("Error checking favorite status: $e");
+    }
+  }
+
+  Future<void> _toggleFavorite() async {
+    try {
+      if (isFavorite && favoriteId != null) {
+        await FavoriteRecipeService.removeFavorite(favoriteId!);
+        setState(() {
+          isFavorite = false;
+          favoriteId = null;
+        });
+      } else {
+        await FavoriteRecipeService.addToFavorites(widget.recipe);
+        final id = await FavoriteRecipeService.getFavoriteIdForRecipe(widget.recipe);
+        setState(() {
+          isFavorite = true;
+          favoriteId = id;
+        });
+      }
+    } catch (e) {
+      debugPrint("Error toggling favorite: $e");
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final recipe = widget.recipe;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(recipe.title),
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: Icon(
+              isFavorite ? Icons.favorite : Icons.favorite_border,
+              color: Colors.red,
+            ),
+            onPressed: _toggleFavorite,
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

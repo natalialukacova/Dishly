@@ -20,4 +20,12 @@ class Nutrient {
   factory Nutrient.empty() {
     return Nutrient(name: '', amount: 0.0, unit: '');
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'amount': amount,
+      'unit': unit,
+    };
+  }
 }
