@@ -28,20 +28,70 @@ class Recipe {
   });
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
-    return Recipe(
-      id: json['id'],
-      title: json['title'],
-      image: json['image'],
-      instructions: json['instructions'] ?? '',
-      readyInMinutes: json['readyInMinutes'],
-      servings: json['servings'],
-      ingredients: List<String>.from(json['ingredients']),
-      nutrients: (json['nutrients'] as List)
+    // Parse instructions (fallback to analyzedInstructions if needed)
+    String instructions = json['instructions'] ?? '';
+    if (instructions.trim().isEmpty &&
+        json['analyzedInstructions'] is List &&
+        json['analyzedInstructions'].isNotEmpty) {
+      final analyzed = json['analyzedInstructions'][0];
+      if (analyzed != null && analyzed['steps'] is List) {
+        instructions = (analyzed['steps'] as List)
+            .map((step) => "${step['number']}. ${step['step']}")
+            .join('\n');
+      }
+    }
+
+    // Handle ingredients from either `ingredients` or `extendedIngredients`
+    List<String> ingredients = [];
+    if (json['ingredients'] != null) {
+      ingredients = List<String>.from(json['ingredients']);
+    } else if (json['extendedIngredients'] is List) {
+      ingredients = (json['extendedIngredients'] as List)
+          .map((e) => e['original']?.toString() ?? '')
+          .where((e) => e.isNotEmpty)
+          .toList();
+    }
+
+    // Handle nutrients from either `nutrients` or `nutrition.nutrients`
+    List<Nutrient> nutrients = [];
+    if (json['nutrients'] != null) {
+      nutrients = (json['nutrients'] as List)
           .map((e) => Nutrient.fromJson(e))
-          .toList(),
-      vegetarian: json['vegetarian'],
-      vegan: json['vegan'],
-      glutenFree: json['glutenFree'],
+          .toList();
+    } else if (json['nutrition']?['nutrients'] is List) {
+      nutrients = (json['nutrition']['nutrients'] as List)
+          .map((e) => Nutrient.fromJson(e))
+          .toList();
+    }
+
+    return Recipe(
+      id: int.tryParse(json['id'].toString()) ?? 0,
+      title: json['title'] ?? '',
+      image: json['image'] ?? '',
+      instructions: instructions,
+      readyInMinutes: json['readyInMinutes'] ?? 0,
+      servings: json['servings'] ?? 0,
+      ingredients: ingredients,
+      nutrients: nutrients,
+      vegetarian: json['vegetarian'] ?? false,
+      vegan: json['vegan'] ?? false,
+      glutenFree: json['glutenFree'] ?? false,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'image': image,
+      'instructions': instructions,
+      'readyInMinutes': readyInMinutes,
+      'servings': servings,
+      'ingredients': ingredients,
+      'nutrients': nutrients.map((n) => n.toJson()).toList(),
+      'vegetarian': vegetarian,
+      'vegan': vegan,
+      'glutenFree': glutenFree,
+    };
   }
 }

@@ -25,18 +25,26 @@ public class WebSocketServerService : BackgroundService
         _server = new WebSocketServer("ws://0.0.0.0:8181");
         _server.Start(socket =>
         {
-            socket.OnOpen = () => Console.WriteLine("Client connected!");
-            socket.OnClose = () => Console.WriteLine("Client disconnected.");
+            socket.OnOpen = () =>
+            {
+                Console.WriteLine($"[Fleck] Connection opened: {socket.ConnectionInfo.ClientIpAddress}");
+            };
+
+            socket.OnClose = () =>
+            {
+                Console.WriteLine($"[Fleck] Connection closed");
+            };
             
             socket.OnMessage = async message =>
             {
-                Console.WriteLine("Received message: " + message);
-
+                Console.WriteLine("[C#] Received message from client: " + message);
+            
                 try
                 {
                     var data = JsonConvert.DeserializeObject<ChatWebSocketMessage>(message);
                     var aiResponse = await _chatProxy.SendToPythonAsync(data.RecipeId, data.Message);
-
+                    Console.WriteLine("[C#] AI response from Python: " + aiResponse);
+                    
                     var response = new
                     {
                         recipeId = data.RecipeId,
@@ -48,7 +56,7 @@ public class WebSocketServerService : BackgroundService
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Error handling message: " + ex.Message);
+                    Console.WriteLine("[C#] Error: " + ex.Message);
                     await socket.Send(JsonConvert.SerializeObject(new
                     {
                         error = "Invalid message or internal server error"

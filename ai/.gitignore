@@ -1,0 +1,62 @@
+﻿# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pkl
+*.db
+
+# Virtual environment
+.venv/
+env/
+venv/
+ENV/
+
+# IDE/editor configs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# Python tooling
+.mypy_cache/
+.pytest_cache/
+.coverage
+.tox/
+
+# Environment config
+.env
+.env.*
+
+# FastAPI & LangChain storage
+memory/
+vectorstore/
+
+# LangChain cache (if using)
+lc_cache/
+langchain.db
+
+# PyInstaller
+dist/
+build/
+*.spec
+
+# Test output
+htmlcov/
+coverage.xml
+pytestdebug.log
+
+# Custom
+*.bak
+*.tmp
+*.old

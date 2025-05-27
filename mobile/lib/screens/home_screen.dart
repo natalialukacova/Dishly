@@ -1,4 +1,6 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:mobile/screens/ai_recipe_generator_screen.dart';
+import 'package:mobile/screens/favorites_screen.dart';
 import '../../../widgets/home_button.dart';
 import '../../../core/theme.dart';
 import './recipe_search_screen.dart';
@@ -20,7 +22,10 @@ class HomeScreen extends StatelessWidget {
       {
         'icon': Icons.smart_toy,
         'label': 'AI Recipe Generator',
-        'onTap': () {}, // TODO
+        'onTap': () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => AIRecipeGeneratorScreen()),
+        ),
       },
       {
         'icon': Icons.dining,
@@ -35,7 +40,10 @@ class HomeScreen extends StatelessWidget {
       {
         'icon': Icons.favorite,
         'label': 'Favorite Recipes',
-        'onTap': () {}, // TODO
+        'onTap': () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => FavoriteRecipesScreen()),
+        ),
       },
       {
         'icon': Icons.chat,
@@ -46,7 +54,7 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Smart Recipe Assistant"),
+        title: const Text("Dishly"),
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
       ),

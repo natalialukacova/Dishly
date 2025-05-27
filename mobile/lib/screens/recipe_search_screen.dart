@@ -102,7 +102,7 @@ class _RecipeSearchScreenState extends State<RecipeSearchScreen> {
                 ),
               ),
               onPressed: _searchRecipes,
-              icon: const Icon(Icons.search),
+              icon: const Icon(Icons.search, color: Colors.white),
               label: Text("Search", style: TextStyle(fontFamily: fontFamily)),
             ),
             const SizedBox(height: 20),
@@ -110,8 +110,6 @@ class _RecipeSearchScreenState extends State<RecipeSearchScreen> {
               const Center(child: CircularProgressIndicator())
             else if (_error != null)
               Text(_error!, style: TextStyle(color: Colors.red, fontFamily: fontFamily))
-            else if (_recipes.isEmpty)
-                Text("No recipes found.", style: TextStyle(color: Colors.grey, fontFamily: fontFamily))
               else
                 Expanded(
                   child: ListView.separated(
