@@ -28,16 +28,6 @@ class HomeScreen extends StatelessWidget {
         ),
       },
       {
-        'icon': Icons.dining,
-        'label': 'Join Cooking Room',
-        'onTap': () {}, // TODO
-      },
-      {
-        'icon': Icons.add_circle_outline,
-        'label': 'Create Cooking Room',
-        'onTap': () {}, // TODO
-      },
-      {
         'icon': Icons.favorite,
         'label': 'Favorite Recipes',
         'onTap': () => Navigator.push(
@@ -45,50 +35,54 @@ class HomeScreen extends StatelessWidget {
           MaterialPageRoute(builder: (_) => FavoriteRecipesScreen()),
         ),
       },
-      {
-        'icon': Icons.chat,
-        'label': 'Chat with AI Chef',
-        'onTap': () {}, // TODO
-      },
     ];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Dishly"),
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Welcome!",
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                fontFamily: fontFamily,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/images/Dishly_logo.png',
+                    width: 300,
+                    height: 300,
+                    fit: BoxFit.contain,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "Ready to Cook Something Delicious?",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontStyle: FontStyle.italic,
+                      color: primaryColor,
+                      fontFamily: fontFamily,
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  ...buttons.map(
+                        (btn) => Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: HomeButton(
+                        label: btn['label'],
+                        icon: btn['icon'],
+                        onPressed: btn['onTap'],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 20),
-            ...buttons.map((btn) => HomeButton(
-              label: btn['label'],
-              icon: btn['icon'],
-              onPressed: btn['onTap'],
-            )),
-          ],
+          ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFFEDF3FA),
-        selectedItemColor: primaryColor,
-        unselectedItemColor: const Color(0xFF8497B0),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.menu_book), label: "Recipes"),
-          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), label: "Chat"),
-        ],
       ),
     );
   }

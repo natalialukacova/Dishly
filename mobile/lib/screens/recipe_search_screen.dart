@@ -4,22 +4,22 @@ import '../models/recipe.dart';
 import '../services/recipe_service.dart';
 import '../core/theme.dart';
 import '../widgets/ingredient_input.dart';
-import '../widgets/dietary_filter_chip.dart';
 import '../widgets/recipe_card.dart';
 
 class RecipeSearchScreen extends StatefulWidget {
+  const RecipeSearchScreen({super.key});
+
   @override
   _RecipeSearchScreenState createState() => _RecipeSearchScreenState();
 }
 
 class _RecipeSearchScreenState extends State<RecipeSearchScreen> {
   final TextEditingController _controller = TextEditingController();
-  final List<String> dietaryOptions = ['Vegan', 'Gluten-Free', 'Keto', 'Vegetarian'];
-  final Set<String> selectedFilters = {};
 
   List<Recipe> _recipes = [];
   bool _isLoading = false;
   String? _error;
+  bool _hasSearched = false;
 
   void _searchRecipes() async {
     final input = _controller.text.trim();
@@ -27,17 +27,14 @@ class _RecipeSearchScreenState extends State<RecipeSearchScreen> {
 
     setState(() {
       _isLoading = true;
+      _hasSearched = true;
       _error = null;
       _recipes = [];
     });
 
     try {
       final ingredientsList = input.split(',').map((s) => s.trim()).toList();
-      print("Searching recipes with: $ingredientsList");
-
-      // Run search in background isolate
       final recipes = await compute(RecipeService.searchRecipes, ingredientsList);
-      print("Found ${recipes.length} recipes");
 
       if (!mounted) return;
 
@@ -46,7 +43,6 @@ class _RecipeSearchScreenState extends State<RecipeSearchScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      print("Error fetching recipes: $e");
       if (!mounted) return;
 
       setState(() {
@@ -55,7 +51,6 @@ class _RecipeSearchScreenState extends State<RecipeSearchScreen> {
       });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -73,25 +68,6 @@ class _RecipeSearchScreenState extends State<RecipeSearchScreen> {
           children: [
             IngredientInput(controller: _controller),
             const SizedBox(height: 16),
-            Wrap(
-              spacing: 10,
-              children: dietaryOptions.map((option) {
-                return DietaryFilterChip(
-                  label: option,
-                  selected: selectedFilters.contains(option),
-                  onSelected: (selected) {
-                    setState(() {
-                      if (selected) {
-                        selectedFilters.add(option);
-                      } else {
-                        selectedFilters.remove(option);
-                      }
-                    });
-                  },
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 20),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
@@ -110,6 +86,26 @@ class _RecipeSearchScreenState extends State<RecipeSearchScreen> {
               const Center(child: CircularProgressIndicator())
             else if (_error != null)
               Text(_error!, style: TextStyle(color: Colors.red, fontFamily: fontFamily))
+            else if (!_hasSearched)
+                Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.restaurant_menu, size: 100, color: primaryColor),
+                        const SizedBox(height: 16),
+                        Text(
+                          "Find recipes by ingredients",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontFamily: fontFamily,
+                            color: Colors.black54,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
               else
                 Expanded(
                   child: ListView.separated(
