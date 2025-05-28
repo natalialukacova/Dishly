@@ -35,7 +35,7 @@ namespace Infrastructure.AI
 
         private class ChatResponse
         {
-            public string Response { get; set; }
+            public required string Response { get; set; }
         }
     }
 }

@@ -23,10 +23,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Dependency Injection
 builder.Services.AddScoped<IFavoriteRecipeRepository, FavoriteRecipeRepository>();
 builder.Services.AddScoped<IFavoriteRecipeService, FavoriteRecipeService>();
-builder.Services.AddScoped<IRecipeApiService, RecipeApiService>();
 
 builder.Services.AddHostedService<WebSocketServerService>();
-builder.Services.AddHttpClient<IAIChatProxy, AIChatProxy>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddRestApi(); 
@@ -44,7 +42,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseRouting();
 app.ConfigureRestApi();        
-app.ConfigureWebsocketApi();    
-app.StartProxyServer();         
+//app.ConfigureWebsocketApi();    
+//app.StartProxyServer();         
 
 app.Run();

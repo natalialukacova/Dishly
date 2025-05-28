@@ -53,9 +53,9 @@ public class FavoriteRecipeService : IFavoriteRecipeService
                 if (recipe != null)
                     fullRecipes.Add(recipe);
             }
-            catch
+            catch (Exception ex)
             {
-                // log if needed
+                Console.WriteLine($"[FavoriteRecipeService] Failed to fetch recipe ID {fav.RecipeId}: {ex.Message}");
             }
         }
 

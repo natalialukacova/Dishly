@@ -80,7 +80,7 @@ class _FavoriteRecipesScreenState extends State<FavoriteRecipesScreen> with Rout
           child: RecipeCard(recipe: recipe),
         );
       },
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, __) => const SizedBox(height: 5),
     );
   }
 
@@ -89,7 +89,7 @@ class _FavoriteRecipesScreenState extends State<FavoriteRecipesScreen> with Rout
     return Scaffold(
       backgroundColor: scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text("My Recipes"),
+        title: const Text("My Favorite Recipes"),
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
       ),

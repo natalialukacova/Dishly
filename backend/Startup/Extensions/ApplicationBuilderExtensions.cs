@@ -12,18 +12,6 @@ public static class ApplicationBuilderExtensions
         return app;
     }
 
-    public static WebApplication ConfigureWebsocketApi(this WebApplication app)
-    {
-        // In the future, you can add WebSocket-specific routes or middleware here
-        return app;
-    }
-
-    public static WebApplication StartProxyServer(this WebApplication app)
-    {
-        // Optional: implement later if you're acting as a reverse proxy to Python etc.
-        return app;
-    }
-
     public static WebApplication MigrateDatabase(this WebApplication app)
     {
         using var scope = app.Services.CreateScope();

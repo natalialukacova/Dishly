@@ -15,6 +15,7 @@ class _AIRecipeGeneratorScreenState extends State<AIRecipeGeneratorScreen> {
   final TextEditingController _ideaController = TextEditingController();
   String? _generatedRecipe;
   bool _isLoading = false;
+  bool _hasGenerated = false;
 
   Future<void> _generateRecipe() async {
     final idea = _ideaController.text.trim();
@@ -23,6 +24,7 @@ class _AIRecipeGeneratorScreenState extends State<AIRecipeGeneratorScreen> {
     setState(() {
       _isLoading = true;
       _generatedRecipe = null;
+      _hasGenerated = true;
     });
 
     final response = await http.post(
@@ -131,22 +133,40 @@ class _AIRecipeGeneratorScreenState extends State<AIRecipeGeneratorScreen> {
               label: const Text("Generate"),
             ),
             const SizedBox(height: 20),
-            if (_isLoading) const CircularProgressIndicator(),
-            if (_generatedRecipe != null)
+            if (_isLoading)
+              const CircularProgressIndicator()
+            else if (!_hasGenerated)
               Expanded(
-                child: Card(
-                  color: Colors.white,
-                  elevation: 2,
-                  margin: const EdgeInsets.only(top: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: SingleChildScrollView(
-                      child: _buildRecipeView(_generatedRecipe!),
-                    ),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.lightbulb_outline, size: 80, color: primaryColor),
+                      const SizedBox(height: 16),
+                      Text(
+                        "Give me an idea and I’ll cook up a recipe!",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 18, color: Colors.black54),
+                      ),
+                    ],
                   ),
                 ),
               )
+            else if (_generatedRecipe != null)
+                Expanded(
+                  child: Card(
+                    color: Colors.white,
+                    elevation: 2,
+                    margin: const EdgeInsets.only(top: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: SingleChildScrollView(
+                        child: _buildRecipeView(_generatedRecipe!),
+                      ),
+                    ),
+                  ),
+                )
           ],
         ),
       ),
