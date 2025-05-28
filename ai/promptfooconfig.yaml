@@ -1,0 +1,34 @@
+﻿description: "Prompt evaluation for Dishly recipe and chat endpoints using Promptfoo"
+
+providers:
+  - id: file://dishly_recipe_provider.py:call_api
+    label: Dishly Recipe API
+  - id: file://dishly_chat_provider.py:call_api
+    label: Dishly Chat API
+
+prompts:
+  - id: scallops-recipe
+    label: "Pan-Seared Scallops Recipe"
+    raw: "Generate a full recipe for: {{ idea }}"
+    vars:
+      idea: "Pan-Seared Scallops with Garlic Butter Linguine and Cherry Tomatoes"
+
+  - id: lentil-chat
+    label: "Ask about lentils"
+    raw: "{{ message }}"
+    vars:
+      recipe_id: 1
+      message: "How long do I cook lentils?"
+
+tests:
+  - promptId: scallops-recipe
+    providerId: file://dishly_recipe_provider.py:call_api
+    assert:
+      - type: contains
+        value: "### Ingredients"
+
+  - promptId: lentil-chat
+    providerId: file://dishly_chat_provider.py:call_api
+    assert:
+      - type: contains
+        value: "Lentils should be cooked for approximately 20 minutes."

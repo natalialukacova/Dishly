@@ -42,6 +42,10 @@ public class WebSocketServerService : BackgroundService
                 try
                 {
                     var data = JsonConvert.DeserializeObject<ChatWebSocketMessage>(message);
+					if (data == null)
+					{
+    					throw new Exception("Deserialized message is null");
+					}
                     var aiResponse = await _chatProxy.SendToPythonAsync(data.RecipeId, data.Message);
                     Console.WriteLine("[C#] AI response from Python: " + aiResponse);
                     

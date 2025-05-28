@@ -1,4 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Application.Models;
+using Application.Interfaces;
+using Core.Domain.Interfaces;
+using Infrastructure.AI;
+using Infrastructure.ExternalApi;
 
 namespace Startup.Extensions;
 
@@ -12,7 +17,11 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection ConfigureAppServices(this IServiceCollection services, IConfiguration configuration)
     {
-        // Add additional configuration or DI here if needed
+        services.Configure<AppOptions>(configuration);
+
+        services.AddHttpClient<IRecipeApiService, RecipeApiService>();
+        services.AddHttpClient<IAIChatProxy, AIChatProxy>();
+        
         return services;
     }
 }

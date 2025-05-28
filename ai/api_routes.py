@@ -1,5 +1,7 @@
 ﻿from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from langchain_core.messages import SystemMessage, HumanMessage
+from starlette.concurrency import run_in_threadpool
+
 from models import ChatMessage, RecipeContext, RecipeIdea
 from llm import llm
 import json
@@ -79,8 +81,9 @@ async def websocket_chat(websocket: WebSocket):
 @router.post("/generate_recipe")
 async def generate_recipe(data: RecipeIdea):
     prompt = generate_recipe_prompt(data.idea)
-    response = llm.invoke([
+    response = await run_in_threadpool(lambda: llm.invoke([
         SystemMessage(content=generate_recipe_system_prompt),
         HumanMessage(content=prompt)
-    ])
+    ]))
+    print("Prompt used:\n", prompt)
     return {"recipe": response.content}
