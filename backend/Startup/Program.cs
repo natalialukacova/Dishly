@@ -11,7 +11,8 @@ using Startup.Extensions;
 using Application.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.UseUrls("http://0.0.0.0:5000");
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 var configuration = builder.Configuration;
 
 builder.Services.AddAppOptions(builder.Configuration);
