@@ -2,9 +2,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/recipe.dart';
+import '../constants.dart';
 
 class RecipeService {
-  static const String baseUrl = 'http://192.168.0.145:5000';
+  static const String baseUrl = backendBaseUrl;
 
   static Future<List<Recipe>> searchRecipes(List<String> ingredients) async {
     final query = ingredients.join(',');

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:web_socket_channel/web_socket_channel.dart';
+import '../constants.dart';
 import '../models/recipe.dart';
 
 /// Stores a recipe via HTTP POST
@@ -14,7 +15,7 @@ ${recipe.instructions}
 """;
 
   await http.post(
-    Uri.parse('http://192.168.0.145:5000/store_recipe'),
+    Uri.parse('$backendBaseUrl/store_recipe'),
     headers: {'Content-Type': 'application/json'},
     body: json.encode({
       'recipe_id': recipe.id,
@@ -26,7 +27,7 @@ ${recipe.instructions}
 /// Loads memory (chat history) for a given recipe
 Future<List<Map<String, String>>> fetchChatMemory(int recipeId) async {
   final response = await http.get(
-    Uri.parse('http://192.168.0.145:8000/memory/$recipeId'),
+      Uri.parse('$aiBaseUrl/memory/$recipeId')
   );
 
   if (response.statusCode == 200) {
@@ -44,6 +45,6 @@ Future<List<Map<String, String>>> fetchChatMemory(int recipeId) async {
 
 /// Creates a WebSocket channel connected to the backend
 WebSocketChannel connectWebSocket({String baseUrl = '192.168.0.145'}) {
-  final uri = Uri.parse('ws://$baseUrl:8000/ws');
+  final uri = Uri.parse('wss://dishly-ai.up.railway.app/ws');
   return WebSocketChannel.connect(uri);
 }

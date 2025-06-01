@@ -2,9 +2,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 import '../models/recipe.dart';
+import '../constants.dart';
 
 class FavoriteRecipeService {
-  static const String baseUrl = 'http://192.168.0.145:5000';
+  static const String baseUrl = backendBaseUrl;
 
   static Future<void> addToFavorites(Recipe recipe) async {
     final url = Uri.parse('$baseUrl/api/favoriterecipe');
