@@ -55,7 +55,7 @@ public class RecipeApiService : IRecipeApiService
 
                 try
                 {
-                    var storeResponse = await _httpClient.PostAsJsonAsync("http://localhost:8000/store_recipe", storePayload);
+                    var storeResponse = await _httpClient.PostAsJsonAsync("https://dishly-production-05ca.up.railway.app/store_recipe", storePayload);
                     if (storeResponse.IsSuccessStatusCode)
                         Console.WriteLine($"[C#] Stored recipe {recipe.Id} in Python backend.");
                     else
