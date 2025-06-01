@@ -1,0 +1,7 @@
+﻿{
+  "build": {
+    "builder": "dockerfile",
+    "dockerfilePath": "ai/Dockerfile",
+    "context": "ai"
+  }
+}
