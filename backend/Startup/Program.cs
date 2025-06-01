@@ -31,6 +31,17 @@ builder.Services.AddHttpClient();
 builder.Services.AddRestApi(); 
 builder.Services.AddWebsocketInfrastructure(); 
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
 app.MapGet("/", () => "Dishly backend is running");
@@ -42,9 +53,9 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage(); 
 }
 
+app.UseCors("AllowAll");
+
 app.UseRouting();
-app.ConfigureRestApi();        
-//app.ConfigureWebsocketApi();    
-//app.StartProxyServer();         
+app.ConfigureRestApi();               
 
 app.Run();
