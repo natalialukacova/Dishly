@@ -1,5 +1,5 @@
-# Flutter Web Builder Image
-FROM ghcr.io/cirruslabs/flutter:stable-web AS build
+# Use Flutter SDK image with web support
+FROM cirrusci/flutter:3.10.5 AS build
 
 WORKDIR /app
 
