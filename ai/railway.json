@@ -1,4 +1,4 @@
-﻿{
+{
   "build": {
     "builder": "dockerfile",
     "dockerfilePath": "ai/Dockerfile",
