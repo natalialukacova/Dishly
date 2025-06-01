@@ -1,0 +1,5 @@
+[phases.setup]
+nixPkgs = ["dart", "flutter"]
+
+[variables]
+DART_SDK_VERSION = "3.7.0"
