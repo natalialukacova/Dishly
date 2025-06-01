@@ -32,6 +32,7 @@ builder.Services.AddWebsocketInfrastructure();
 
 var app = builder.Build();
 
+app.MapGet("/", () => "Dishly backend is running");
 
 app.MigrateDatabase(); 
 
