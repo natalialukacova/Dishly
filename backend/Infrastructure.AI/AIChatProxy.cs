@@ -21,7 +21,7 @@ namespace Infrastructure.AI
                 message = message
             };
 
-            var response = await _httpClient.PostAsJsonAsync("http://localhost:8000/chat", payload);
+            var response = await _httpClient.PostAsJsonAsync("https://dishly-production-05ca.up.railway.app/chat", payload);
 
             if (!response.IsSuccessStatusCode)
             {
