@@ -4,10 +4,10 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /app
 
-# Copy built Flutter web files
-COPY build/web .
+# Copy Flutter Web build
+COPY build/web/ .
 
-# Install `serve` to serve static files
+# Install a static file server
 RUN npm install -g serve
 
 # Expose default port
