@@ -8,7 +8,7 @@ public static class ApplicationBuilderExtensions
 {
     public static WebApplication ConfigureRestApi(this WebApplication app)
     {
-        app.MapControllers();
+        app.MapControllers().RequireCors("AllowAll");
         return app;
     }
 
