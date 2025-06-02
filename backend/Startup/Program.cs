@@ -56,6 +56,6 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowAll");
 
 app.UseRouting();
-app.ConfigureRestApi();               
+app.MapControllers();
 
 app.Run();
