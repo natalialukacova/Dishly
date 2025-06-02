@@ -1,6 +1,6 @@
 ﻿import os
 
 OLLAMA_MODEL_NAME = os.getenv("OLLAMA_MODEL_NAME", "llama3")
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
-MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "dishly")
-MONGO_COLLECTION = os.getenv("MONGO_COLLECTION", "chat_memory")
+MONGO_URI = os.environ["MONGO_URI"]
+MONGO_DB_NAME = os.environ["MONGO_DB_NAME"]
+MONGO_COLLECTION = os.environ["MONGO_COLLECTION"]
